@@ -7,8 +7,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ['Jaci Brunning']
   gem.email         = ['jaci.brunning@mgail.com']
   gem.homepage      = 'https://github.com/JaciBrunning/mongoid-revisions'
-  gem.summary       = 'Custom versioning, inspired by Mongoid::Versioning by Durran Jordan and Mario Uher'
-  gem.description   = ''
+  gem.summary       = 'Keep revisions of your Mongoid documents to go back in time, inspired by Mongoid::Versioning by Durran Jordan and Mario Uher'
   gem.licenses      = ['MIT']
 
   gem.files         = `git ls-files`.split("\n")

@@ -1,0 +1,2 @@
+- Include `person.pets.map! { |x| x.revision_at person.updated_at }` as an option
+when reifying the parent model for present relations.
