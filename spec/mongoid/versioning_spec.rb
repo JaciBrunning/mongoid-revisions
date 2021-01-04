@@ -2,11 +2,11 @@ require_relative '../spec_helper'
 require 'date'
 require 'timecop'
 
-describe Mongoid::Versioning do
-  describe "#version_idx" do
+describe Mongoid::Revisions do
+  describe "#revision_idx" do
     context "when the document is new" do
       it "should be 1" do
-        expect(Person.create.version_idx).to eq(1)
+        expect(Person.create.revision_idx).to eq(1)
       end
     end
 
@@ -14,7 +14,7 @@ describe Mongoid::Versioning do
       let(:person) { Person.create }
       before { person.revise! }
       it "should be 2" do
-        expect(person.version_idx).to eq(2)
+        expect(person.revision_idx).to eq(2)
       end
     end
 
@@ -22,45 +22,45 @@ describe Mongoid::Versioning do
       let(:person) { Person.create }
       before { 5.times { person.revise! } }
       it "should update" do
-        expect(person.version_idx).to eq(6)
+        expect(person.revision_idx).to eq(6)
       end
     end
   end
 
-  describe "#versions" do
+  describe "#revisions" do
     let(:person) { Person.create name: '1' }
 
     context "when the document is new" do
       it "should be empty" do
-        expect(person.versions.empty?).to be true
-        expect(person.has_versions?).to be false
+        expect(person.revisions.empty?).to be true
+        expect(person.has_revisions?).to be false
       end
     end
 
     context "when the document is revised" do
       before { person.revise }
       it "should have the baseline revision" do
-        expect(person.versions.count).to eq(1)
-        expect(person.has_versions?).to eq true
+        expect(person.revisions.count).to eq(1)
+        expect(person.has_revisions?).to eq true
       end
       
       context "then revised again with changes" do
         context "via first level attributes," do
           before { person.name = '2'; person.revise }
 
-          it "should have a new version" do
-            expect(person.versions.count).to eq(2)
+          it "should have a new revision" do
+            expect(person.revisions.count).to eq(2)
           end
 
-          context "the first reified version" do
-            let(:reified) { person.versions[0].reify }
+          context "the first reified revision" do
+            let(:reified) { person.revisions[0].reify }
             it "should have the old attributes" do
               expect(reified.name).to eq('1')
             end
           end
 
-          context "the second reified version" do
-            let(:reified) { person.versions[1].reify }
+          context "the second reified revision" do
+            let(:reified) { person.revisions[1].reify }
             it "should have the new attributes" do
               expect(reified.name).to eq('2')
             end
@@ -70,19 +70,19 @@ describe Mongoid::Versioning do
         context "via embedded documents," do
           before { person.addresses.create(address: 'addr1'); person.revise }
 
-          it "should have a new version" do
-            expect(person.versions.count).to eq(2)
+          it "should have a new revision" do
+            expect(person.revisions.count).to eq(2)
           end
 
-          context "the first reified version" do
-            let(:reified) { person.versions[0].reify }
+          context "the first reified revision" do
+            let(:reified) { person.revisions[0].reify }
             it "should have the old attributes" do
               expect(reified.addresses.empty?).to be true
             end
           end
 
-          context "the second reified version" do
-            let(:reified) { person.versions[1].reify }
+          context "the second reified revision" do
+            let(:reified) { person.revisions[1].reify }
             it "should have the new attributes" do
               expect(reified.addresses.size).to eq(1)
               expect(reified.addresses.first.address).to eq('addr1')
@@ -93,19 +93,19 @@ describe Mongoid::Versioning do
         context "via has_and_belongs_to_many," do
           before { person.pets.create(name: 'pet1'); person.revise }
 
-          it "should have a new version" do
-            expect(person.versions.count).to eq(2)
+          it "should have a new revision" do
+            expect(person.revisions.count).to eq(2)
           end
 
-          context "the first reified version" do
-            let(:reified) { person.versions[0].reify }
+          context "the first reified revision" do
+            let(:reified) { person.revisions[0].reify }
             it "should have the old attributes" do
               expect(reified.pets.empty?).to be true
             end
           end
 
-          context "the second reified version" do
-            let(:reified) { person.versions[1].reify }
+          context "the second reified revision" do
+            let(:reified) { person.revisions[1].reify }
             it "should have the new attributes" do
               expect(reified.pets.size).to eq(1)
               expect(reified.pets.first.name).to eq('pet1')
@@ -121,27 +121,27 @@ describe Mongoid::Versioning do
 
       context "then revised again without changes" do
         before { person.revise }
-        it "should not have any additional versions" do
-          expect(person.versions.count).to eq(1)
+        it "should not have any additional revisions" do
+          expect(person.revisions.count).to eq(1)
         end
       end
 
       context "then revised again without changes forcefully" do
         before { person.revise! }
 
-        it "should have a new version" do
-          expect(person.versions.count).to eq(2)
+        it "should have a new revision" do
+          expect(person.revisions.count).to eq(2)
         end
       end
     end
   end
 
-  describe "#version" do
+  describe "#revision" do
     let(:person) { Person.create }
     context "when the document is new" do
       it "should be nil" do
-        expect(person.version).to be nil
-        expect(person.version?).to be false
+        expect(person.revision).to be nil
+        expect(person.revision?).to be false
       end
 
       it "should be live" do
@@ -152,8 +152,8 @@ describe Mongoid::Versioning do
     context "when the document is revised" do
       before { person.revise! }
       it "should be nil" do
-        expect(person.version).to be nil
-        expect(person.version?).to be false
+        expect(person.revision).to be nil
+        expect(person.revision?).to be false
       end
 
       it "should be live" do
@@ -161,39 +161,39 @@ describe Mongoid::Versioning do
       end
 
       context "and reified to the first revision" do
-        let(:reified) { person.versions.first.reify }
+        let(:reified) { person.revisions.first.reify }
 
         it "should not be live" do
           expect(reified.live?).to be false
         end
 
-        it "should be a ModelVersion" do
-          expect(reified.version).to be_instance_of(Mongoid::Versioning::ModelVersion)
-          expect(reified.version?).to be true
+        it "should be a ModelRevision" do
+          expect(reified.revision).to be_instance_of(Mongoid::Revisions::ModelRevision)
+          expect(reified.revision?).to be true
         end
 
         it "should have the correct idx" do
-          expect(reified.version.idx).to eq(1)
-          expect(reified.version.idx).to eq(reified.version_idx)
+          expect(reified.revision.idx).to eq(1)
+          expect(reified.revision.idx).to eq(reified.revision_idx)
         end
 
         it "should have the correct model class" do
-          expect(reified.version.model_class).to eq(Person)
+          expect(reified.revision.model_class).to eq(Person)
         end
       end
     end
   end
 
-  describe "#version_at" do
+  describe "#revision_at" do
     let(:person) { Person.create name: "No name" }
-    context "when versions do not exist" do
-      it "selects the live version" do
-        march_15 = person.version_at(DateTime.new(2020, 3, 15))
+    context "when revisions do not exist" do
+      it "selects the live revision" do
+        march_15 = person.revision_at(DateTime.new(2020, 3, 15))
         expect(march_15.name).to eq("No name")
       end
     end
 
-    context "when versions exist" do
+    context "when revisions exist" do
       before do
         Timecop.freeze(DateTime.new(2020, 4)) do 
           person.name = "April"
@@ -216,33 +216,33 @@ describe Mongoid::Versioning do
         end
       end
 
-      context "when the timestamp is before all versions" do
-        it "selects the earliest version" do
-          march_15 = person.version_at(DateTime.new(2020, 3, 15))
+      context "when the timestamp is before all revisions" do
+        it "selects the earliest revision" do
+          march_15 = person.revision_at(DateTime.new(2020, 3, 15))
           expect(march_15.name).to eq("April")
         end
       end
 
-      context "when the timestamp is inbetween versions" do
-        it "selects the earlier version" do
-          april_15 = person.version_at(DateTime.new(2020, 4, 15))
+      context "when the timestamp is inbetween revisions" do
+        it "selects the earlier revision" do
+          april_15 = person.revision_at(DateTime.new(2020, 4, 15))
           expect(april_15.name).to eq("April")
-          may_15 = person.version_at(DateTime.new(2020, 5, 15))
+          may_15 = person.revision_at(DateTime.new(2020, 5, 15))
           expect(may_15.name).to eq("May")
         end
       end
 
-      context "when the timestamp is beyond all versions" do
+      context "when the timestamp is beyond all revisions" do
         context "and below updated_at" do
-          it "selects the latest version" do
-            june_15 = person.version_at(DateTime.new(2020, 6, 15))
+          it "selects the latest revision" do
+            june_15 = person.revision_at(DateTime.new(2020, 6, 15))
             expect(june_15.name).to eq("June")
           end
         end
 
         context "and above updated_at" do
-          it "selects the live version" do
-            december = person.version_at(DateTime.new(2020, 12))
+          it "selects the live revision" do
+            december = person.revision_at(DateTime.new(2020, 12))
             expect(december.name).to eq("July")
             expect(december.live?).to be true
           end

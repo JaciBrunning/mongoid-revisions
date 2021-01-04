@@ -1,12 +1,12 @@
 $LOAD_PATH << File.expand_path('../lib', __FILE__)
-require 'mongoid/versioning/version'
+require 'mongoid/revisions/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = 'mongoid-versioning'
-  gem.version       = Mongoid::Versioning::VERSION
+  gem.name          = 'mongoid-revisions'
+  gem.version       = Mongoid::Revisions::VERSION
   gem.authors       = ['Jaci Brunning']
   gem.email         = ['jaci.brunning@mgail.com']
-  gem.homepage      = 'https://github.com/JaciBrunning/mongoid-versioning'
+  gem.homepage      = 'https://github.com/JaciBrunning/mongoid-revisions'
   gem.summary       = 'Custom versioning, inspired by Mongoid::Versioning by Durran Jordan and Mario Uher'
   gem.description   = ''
   gem.licenses      = ['MIT']

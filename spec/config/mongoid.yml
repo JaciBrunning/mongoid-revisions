@@ -1,7 +1,7 @@
 test:
   sessions:
     default:
-      database: mongoid_versioning_test
+      database: mongoid_revisions_test
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
   # options:

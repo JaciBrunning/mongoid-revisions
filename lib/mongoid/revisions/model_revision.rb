@@ -1,12 +1,12 @@
 module Mongoid
-  module Versioning
-    class ModelVersion
+  module Revisions
+    class ModelRevision
       def initialize attrs
         @attrs = attrs
       end
 
       def metadata
-        @attrs['_version_metadata']
+        @attrs['_revision_metadata']
       end
 
       def updated_at
@@ -28,7 +28,7 @@ module Mongoid
       def reify
         mc = model_class.new @attrs 
         mc.updated_at = updated_at if mc.respond_to? :updated_at
-        mc._set_version self
+        mc._set_revision self
         mc
       end
 
