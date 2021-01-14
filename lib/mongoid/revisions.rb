@@ -56,7 +56,7 @@ module Mongoid
 
     def revise
       return false if revision?
-      save
+      save!
       self.reload  # Required in order to populate self.attributes with relations. Also requires save.
       if !has_revisions? || revision_attrs_changed?
         _do_revise
@@ -67,7 +67,7 @@ module Mongoid
 
     def revise!
       return false if revision?
-      save
+      save!
       self.reload  # Required in order to populate self.attributes with relations. Also requires save.
       _do_revise
     end
@@ -82,7 +82,7 @@ module Mongoid
         }
       })
       self.revision_idx = (self.revision_idx || 1) + 1
-      save
+      save!
       true
     end
 

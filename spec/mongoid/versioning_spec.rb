@@ -212,7 +212,7 @@ describe Mongoid::Revisions do
 
         Timecop.freeze(DateTime.new(2020, 7)) do
           person.name = "July"
-          person.save
+          person.save!
         end
       end
 
