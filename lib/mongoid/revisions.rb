@@ -19,6 +19,10 @@ module Mongoid
       self._revisions.map { |x| ModelRevision.new x }
     end
 
+    def lazy_revisions
+      self._revisions.lazy.map { |x| ModelRevision.new x }
+    end
+
     def has_revisions?
       !self._revisions.empty?
     end
@@ -35,6 +39,11 @@ module Mongoid
       return latest.reify if timestamp >= latest.updated_at
       rev = self._revisions.reverse_each.find { |x| x['_revision_metadata']['updated_at'] <= timestamp }
       return ModelRevision.new(rev).reify
+    end
+
+    def revision_with_idx idx
+      return self if self.revision_idx == idx
+      lazy_revisions.find { |r| r.idx == idx }.reify
     end
 
     def revision?
