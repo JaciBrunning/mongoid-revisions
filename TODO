@@ -1,2 +1,3 @@
 - Include `person.pets.map! { |x| x.revision_at person.updated_at }` as an option
 when reifying the parent model for present relations.
+- .revisions may be a bit too expensive, pre-emptively coercing to ModelRevision across the entire collection. Move to an enumerable, while retaining support for array indexing?
