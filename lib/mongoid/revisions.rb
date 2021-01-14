@@ -43,7 +43,7 @@ module Mongoid
 
     def revision_with_idx idx
       return self if self.revision_idx == idx
-      lazy_revisions.find { |r| r.idx == idx }.reify
+      lazy_revisions.find { |r| r.idx == idx }&.reify
     end
 
     def revision?
